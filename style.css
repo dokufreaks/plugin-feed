@@ -1,0 +1,4 @@
+div.dokuwiki a.feed {
+  background: transparent url(images/rss_icon.png) 0px 1px no-repeat;
+  padding: 1px 0px 1px 16px;
+}
