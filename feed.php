@@ -22,10 +22,10 @@ session_write_close();
 
 $plugin = $_REQUEST['plugin'];
 $fn     = $_REQUEST['fn'];
-$ns     = $_REQUEST['ns'];
+$ns     = cleanID(urldecode($_REQUEST['ns']));
 $num    = $_REQUEST['num'];
-$other  = $_REQUEST['tag'].$_REQUEST['user'];
-$title  = $_REQUEST['title'];
+$other  = urldecode($_REQUEST['tag'].$_REQUEST['user']);
+$title  = urldecode($_REQUEST['title']);
 $type   = $_REQUEST['type'];
 
 if ($type == '') $type = $conf['rss_type'];
