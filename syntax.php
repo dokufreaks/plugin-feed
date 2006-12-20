@@ -31,7 +31,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
       'threads'  => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
       'editor'   => array('plugin' => 'editor', 'params' => array('ns', 'user')),
       'topic'    => array('plugin' => 'tag', 'params' => array('ns', 'tag')),
-      'tasks'    => array('plugin' => 'task', 'params' => array('ns', 'num')),
+      'tasks'    => array('plugin' => 'task', 'params' => array('ns', 'filter')),
     );
     foreach ($feeds as $key => $value){
       if (!@file_exists(DOKU_PLUGIN.$value['plugin'].'/helper.php')) unset($feeds[$key]);
@@ -43,7 +43,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     return array(
       'author' => 'Esther Brunner',
       'email'  => 'wikidesign@gmail.com',
-      'date'   => '2006-12-19',
+      'date'   => '2006-12-20',
       'name'   => 'Feed Plugin',
       'desc'   => 'Generates feeds for other plugins',
       'url'    => 'http://www.wikidesign.ch/en/plugin/feed/start',
