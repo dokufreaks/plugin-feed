@@ -99,10 +99,10 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     if (!$title) $title = ucwords(str_replace('_', ' ', $p2));
   
     if($mode == 'xhtml'){
-      $url = DOKU_BASE.'lib/plugins/feed/feed.php?plugin='.$plugin.'&fn='.$fn.
-        '&'.$feeds[$feed]['params'][0].'='.urlencode($p1);
-      if ($p2) $url .= '&'.$feeds[$feed]['params'][1].'='.urlencode($p2);
-      $url .= '&title='.urlencode($po->getLang($feed));
+      $url = DOKU_BASE.'lib/plugins/feed/feed.php?plugin='.$plugin.'&amp;fn='.$fn.
+        '&amp;'.$feeds[$feed]['params'][0].'='.urlencode($p1);
+      if ($p2) $url .= '&amp;'.$feeds[$feed]['params'][1].'='.urlencode($p2);
+      $url .= '&amp;title='.urlencode($po->getLang($feed));
       $title = hsc($title);
       
       $renderer->doc .= '<a href="'.$url.'" class="feed" rel="nofollow"'.
