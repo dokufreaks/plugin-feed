@@ -54,7 +54,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
   function getSort(){ return 308; }
   
   function connectTo($mode){
-    $this->Lexer->addSpecialPattern('\{\{.+?feed>.+?\}\}', $mode, 'plugin_feed');
+    $this->Lexer->addSpecialPattern('\{\{\w+?feed>.+?\}\}', $mode, 'plugin_feed');
   }
 
   /**
