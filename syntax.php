@@ -43,7 +43,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     return array(
       'author' => 'Esther Brunner',
       'email'  => 'wikidesign@gmail.com',
-      'date'   => '2006-12-20',
+      'date'   => '2007-01-16',
       'name'   => 'Feed Plugin',
       'desc'   => 'Generates feeds for other plugins',
       'url'    => 'http://www.wikidesign.ch/en/plugin/feed/start',
@@ -57,25 +57,23 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     $this->Lexer->addSpecialPattern('\{\{\w+?feed>.+?\}\}', $mode, 'plugin_feed');
   }
 
-  /**
-   * Handle the match
-   */
   function handle($match, $state, $pos, &$handler){
+    global $ID;
+    
     $match = substr($match, 2, -2); // strip markup
     list($feed, $data) = explode('>', $match, 2);
     $feed = substr($feed, 0, -4);
     list($params, $title) = explode('|', $data, 2);
     list($param1, $param2) = explode('?', $params, 2);
+    
+    if (($param1 == '*') || ($param1 == ':')) $param1 = '';
+    elseif ($param1 == '.') $param1 = getNS($ID);
+    else $param1 = cleanID($param1);
 
-    return array($feed, cleanID($param1), trim($param2), trim($title));
+    return array($feed, $param1, trim($param2), trim($title));
   }
 
-  /**
-   * Create output
-   */
   function render($mode, &$renderer, $data){
-    global $ID;
-    
     list($feed, $p1, $p2, $title) = $data;
     
     $feeds = $this->_registeredFeeds();
@@ -91,10 +89,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     }
     
     $fn = 'get'.ucwords($feed);
-    
-    if (($p1 == '*') || ($p1 == ':')) $p1 = '';
-    elseif ($p1 == '.') $p1 = getNS($ID);
-    
+        
     if (!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $p1));
     if (!$title) $title = ucwords(str_replace('_', ' ', $p2));
   
