@@ -41,12 +41,12 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
 
   function getInfo(){
     return array(
-      'author' => 'Esther Brunner',
-      'email'  => 'wikidesign@gmail.com',
+      'author' => 'Gina Häußge, Michael Klier, Esther Brunner',
+      'email'  => 'dokuwiki@chimeric.de',
       'date'   => '2007-01-16',
       'name'   => 'Feed Plugin',
       'desc'   => 'Generates feeds for other plugins',
-      'url'    => 'http://www.wikidesign.ch/en/plugin/feed/start',
+      'url'    => 'http://wiki.splitbrain.org/plugin:feed',
     );
   }
 
