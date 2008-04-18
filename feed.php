@@ -132,7 +132,7 @@ function feed_getPages(&$rss, &$po, $ns, $num, $fn){
     else $item->title = ucwords($id);
 
     // link
-    $item->link = wl($page['id'], '', true, '&').$page['anchor'];
+    $item->link = wl($page['id'], '', true, '&') . '#' . $page['anchor'];
     
     // description
     if ($page['desc']) $item->description = htmlspecialchars($page['desc']);
