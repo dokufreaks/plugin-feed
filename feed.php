@@ -7,8 +7,8 @@
  * @author     Esther Brunner <wikidesign@gmail.com>
  */
 
-if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../../').'/');
-if(!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
+if (!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../../').'/');
+if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_INC.'inc/init.php');
 require_once(DOKU_INC.'inc/common.php');
 require_once(DOKU_INC.'inc/events.php');
@@ -30,26 +30,26 @@ $type   = $_REQUEST['type'];
 
 if ($type == '') $type = $conf['rss_type'];
 
-switch ($type){
-  case 'rss':
-    $type = 'RSS0.91';
-    $mime = 'text/xml';
-    break;
-  case 'rss2':
-    $type = 'RSS2.0';
-    $mime = 'text/xml';
-    break;
-  case 'atom':
-    $type = 'ATOM0.3';
-    $mime = 'application/xml';
-    break;
-  case 'atom1':
-    $type = 'ATOM1.0';
-    $mime = 'application/atom+xml';
-    break;
-  default:
-    $type = 'RSS1.0';
-    $mime = 'application/xml';
+switch ($type) {
+    case 'rss':
+        $type = 'RSS0.91';
+        $mime = 'text/xml';
+        break;
+    case 'rss2':
+        $type = 'RSS2.0';
+        $mime = 'text/xml';
+        break;
+    case 'atom':
+        $type = 'ATOM0.3';
+        $mime = 'application/xml';
+        break;
+    case 'atom1':
+        $type = 'ATOM1.0';
+        $mime = 'application/atom+xml';
+        break;
+    default:
+        $type = 'RSS1.0';
+        $mime = 'application/xml';
 }
 
 // the feed is dynamic - we need a cache for each combo
@@ -57,9 +57,9 @@ switch ($type){
 $cache = getCacheName($plugin.$fn.$ns.$num.$other.$type.$_SERVER['REMOTE_USER'],'.feed');
 $cmod = @filemtime($cache); // 0 if not exists
 if ($cmod && (@filemtime(DOKU_CONF.'local.php') > $cmod
-  || @filemtime(DOKU_CONF.'dokuwiki.php') > $cmod)){
-  // ignore cache if feed prefs may have changed
-  $cmod = 0;
+            || @filemtime(DOKU_CONF.'dokuwiki.php') > $cmod)) {
+    // ignore cache if feed prefs may have changed
+    $cmod = 0;
 }
 
 // check cacheage and deliver if nothing has changed since last
@@ -67,14 +67,13 @@ if ($cmod && (@filemtime(DOKU_CONF.'local.php') > $cmod
 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 header('Pragma: public');
 header('Content-Type: application/xml; charset=utf-8');
-if ($cmod &&
-  (($cmod + $conf['rss_update'] > time()) || ($cmod > @filemtime($conf['changelog'])))){
-  http_conditionalRequest($cmod);
-  if($conf['allowdebug']) header("X-CacheUsed: $cache");
-  print io_readFile($cache);
-  exit;
+if ($cmod && (($cmod + $conf['rss_update'] > time()) || ($cmod > @filemtime($conf['changelog'])))) {
+    http_conditionalRequest($cmod);
+    if ($conf['allowdebug']) header("X-CacheUsed: $cache");
+    print io_readFile($cache);
+    exit;
 } else {
-  http_conditionalRequest(time());
+    http_conditionalRequest(time());
 }
 
 // create new feed
@@ -111,51 +110,49 @@ print $feed;
  * @author Andreas Gohr <andi@splitbrain.org>
  * @author Esther Brunner <wikidesign@gmail.com>
  */
-function feed_getPages(&$rss, &$po, $ns, $num, $fn){
-  global $conf;
-  
-  if ((!$num) || (!is_numeric($num))) $num = $conf['recent'];
-  
-  // get the pages for our namespace
-  $pages = $po->$fn($ns, $num);
-  if (!$pages) return false;
-   
-  foreach ($pages as $page){
-    $item = new FeedItem();
-    
-    list($id, $hash) = explode('#', $page['id'], 2);
-    $meta = p_get_metadata($id);
+function feed_getPages(&$rss, &$po, $ns, $num, $fn) {
+    global $conf;
 
-    // title
-    if ($page['title']) $item->title = $page['title'];
-    elseif ($meta['title']) $item->title = $meta['title'];
-    else $item->title = ucwords($id);
+    if ((!$num) || (!is_numeric($num))) $num = $conf['recent'];
 
-    // link
-    $item->link = wl($page['id'], '', true, '&') . '#' . $page['anchor'];
-    
-    // description
-    if ($page['desc']) $item->description = htmlspecialchars($page['desc']);
-    else $item->description = htmlspecialchars($meta['description']['abstract']);
-    
-    // date
-    $item->date = date('r', $page['date']);
-    
-    // category
-    if ($page['cat']){
-       $item->category = $page['cat'];
-    } elseif ($meta['subject']){
-      if (is_array($meta['subject'])) $item->category = $meta['subject'][0];
-      else $item->category = $meta['subject'];
+    // get the pages for our namespace
+    $pages = $po->$fn($ns, $num);
+    if (!$pages) return false;
+
+    foreach ($pages as $page) {
+        $item = new FeedItem();
+
+        list($id, $hash) = explode('#', $page['id'], 2);
+        $meta = p_get_metadata($id);
+
+        // title
+        if ($page['title']) $item->title = $page['title'];
+        elseif ($meta['title']) $item->title = $meta['title'];
+        else $item->title = ucwords($id);
+
+        // link
+        $item->link = wl($page['id'], '', true, '&') . '#' . $page['anchor'];
+
+        // description
+        if ($page['desc']) $item->description = htmlspecialchars($page['desc']);
+        else $item->description = htmlspecialchars($meta['description']['abstract']);
+
+        // date
+        $item->date = date('r', $page['date']);
+
+        // category
+        if ($page['cat']) {
+            $item->category = $page['cat'];
+        } elseif ($meta['subject']) {
+            if (is_array($meta['subject'])) $item->category = $meta['subject'][0];
+            else $item->category = $meta['subject'];
+        }
+
+        // creator
+        if ($page['user']) $item->author = $page['user'];
+        else $item->author = $meta['creator'];
+
+        $rss->addItem($item);
     }
-    
-    // creator
-    if ($page['user']) $item->author = $page['user'];
-    else $item->author = $meta['creator'];
-
-    $rss->addItem($item);
-  }
-  
 }
-
-//Setup VIM: ex: et ts=2 enc=utf-8 :
+//vim:ts=4:sw=4:et:enc=utf-8:
