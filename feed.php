@@ -155,4 +155,4 @@ function feed_getPages(&$rss, &$po, $ns, $num, $fn) {
         $rss->addItem($item);
     }
 }
-//vim:ts=4:sw=4:et:enc=utf-8:
+// vim:ts=4:sw=4:et:enc=utf-8:
