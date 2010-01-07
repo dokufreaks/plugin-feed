@@ -16,6 +16,7 @@ require_once(DOKU_INC.'inc/parserutils.php');
 require_once(DOKU_INC.'inc/feedcreator.class.php');
 require_once(DOKU_INC.'inc/auth.php');
 require_once(DOKU_INC.'inc/pageutils.php');
+require_once(DOKU_INC.'inc/httputils.php');
 
 //close session
 session_write_close();
