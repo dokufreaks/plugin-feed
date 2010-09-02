@@ -1,0 +1,8 @@
+# General Plugin Info do not edit
+base   feed
+author Michael Klier, Gina Haeussge
+email  dokuwiki@chimeric.de
+date   2010-01-07
+name   Feed Plugin
+desc   Generates feeds for other plugins
+url    http://www.dokuwiki.org/plugin:feed
