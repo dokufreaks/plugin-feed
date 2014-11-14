@@ -153,10 +153,17 @@ function feed_getPages(&$rss, &$po, $ns, $num, $fn) {
 
         // description
         if($page['desc']) {
-            $item->description = htmlspecialchars($page['desc']);
+            $description = $page['desc'];
         } else {
-            $item->description = htmlspecialchars($meta['description']['abstract']);
+            $description = $meta['description']['abstract'];
         }
+        if(get_class($po) == 'helper_plugin_discussion') {
+            //discussion plugins returns striped parsed text, inclusive encoded chars. Don't double encode.
+            $description =  htmlspecialchars($description, ENT_COMPAT, 'UTF-8', $double_encode = false);
+        } else {
+            $description =  htmlspecialchars($description);
+        }
+        $item->description = $description;
 
         // date
         $item->date = date('r', $page['date']);
