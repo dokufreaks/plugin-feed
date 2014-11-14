@@ -9,9 +9,9 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 
-if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN', DOKU_INC.'lib/plugins/');
-require_once(DOKU_PLUGIN.'syntax.php');
-
+/**
+ * Class syntax_plugin_feed
+ */
 class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
 
     /**
@@ -24,7 +24,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      *
      * Unless the second parameter is 'num', your plugin will have to handle it on its own
      */
-    function _registeredFeeds() {
+    protected function _registeredFeeds() {
         $feeds = array(
                 'blog'     => array('plugin' => 'blog', 'params' => array('ns', 'num')),
                 'comments' => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
@@ -39,25 +39,39 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         return $feeds;
     }
 
-    function getInfo() {
-        return array(
-                'author' => 'Gina Häußge, Michael Klier, Esther Brunner',
-                'email'  => 'dokuwiki@chimeric.de',
-                'date'   => '2007-01-16',
-                'name'   => 'Feed Plugin',
-                'desc'   => 'Generates feeds for other plugins',
-                'url'    => 'http://wiki.splitbrain.org/plugin:feed',
-                );
-    }
+    /**
+     * Syntax Type
+     *
+     * Needs to return one of the mode types defined in $PARSER_MODES in parser.php
+     *
+     * @return string
+     */
+    public function getType() { return 'substition'; }
 
-    function getType() { return 'substition'; }
-    function getSort() { return 308; }
+    /**
+     * Sort for applying this mode
+     *
+     * @return int
+     */
+    public function getSort() { return 308; }
 
-    function connectTo($mode) {
+    /**
+     * @param string $mode
+     */
+    public function connectTo($mode) {
         $this->Lexer->addSpecialPattern('\{\{\w+?feed>.+?\}\}', $mode, 'plugin_feed');
     }
 
-    function handle($match, $state, $pos, &$handler) {
+    /**
+     * Handler to prepare matched data for the rendering process
+     *
+     * @param   string       $match   The text matched by the patterns
+     * @param   int          $state   The lexer state for the match
+     * @param   int          $pos     The character position of the matched text
+     * @param   Doku_Handler $handler The Doku_Handler object
+     * @return  array Return an array with all data you want to use in render
+     */
+    public function handle($match, $state, $pos, Doku_Handler $handler) {
         global $ID;
 
         $match = substr($match, 2, -2); // strip markup
@@ -73,7 +87,15 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         return array($feed, $param1, trim($param2), trim($title));
     }
 
-    function render($mode, &$renderer, $data) {
+    /**
+     * Handles the actual output creation.
+     *
+     * @param   $mode   string        output format being rendered
+     * @param   $renderer Doku_Renderer the current renderer object
+     * @param   $data     array         data created by handler()
+     * @return  boolean                 rendered correctly?
+     */
+    public function render($mode, Doku_Renderer $renderer, $data) {
         list($feed, $p1, $p2, $title) = $data;
 
         $feeds = $this->_registeredFeeds();
@@ -94,6 +116,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         if (!$title) $title = ucwords(str_replace('_', ' ', $p2));
 
         if ($mode == 'xhtml') {
+            /** @var Doku_Renderer_xhtml $renderer */
             $url = DOKU_BASE.'lib/plugins/feed/feed.php?plugin='.$plugin.'&amp;fn='.$fn.
                 '&amp;'.$feeds[$feed]['params'][0].'='.urlencode($p1);
             if ($p2) $url .= '&amp;'.$feeds[$feed]['params'][1].'='.urlencode($p2);
@@ -107,6 +130,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
 
             // for metadata renderer
         } elseif ($mode == 'metadata') {
+            /** @var Doku_Renderer_metadata $renderer */
             if ($renderer->capture) $renderer->doc .= $title;
 
             return true;

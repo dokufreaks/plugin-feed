@@ -93,7 +93,9 @@ $image->url = DOKU_URL."lib/images/favicon.ico";
 $image->link = DOKU_URL;
 $rss->image = $image;
 
-if ($po =& plugin_load('helper', $plugin)) feed_getPages($rss, $po, $ns, $num, $fn);
+if ($po =& plugin_load('helper', $plugin)) {
+    feed_getPages($rss, $po, $ns, $num, $fn);
+}
 
 $feed = $rss->createFeed($type, 'utf-8');
 
@@ -110,6 +112,13 @@ print $feed;
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  * @author Esther Brunner <wikidesign@gmail.com>
+ *
+ * @param DokuWikiFeedCreator $rss
+ * @param DokuWiki_Plugin $po
+ * @param string $ns
+ * @param int $num
+ * @param string $fn
+ * @return bool
  */
 function feed_getPages(&$rss, &$po, $ns, $num, $fn) {
     global $conf;
@@ -155,5 +164,6 @@ function feed_getPages(&$rss, &$po, $ns, $num, $fn) {
 
         $rss->addItem($item);
     }
+    return true;
 }
 // vim:ts=4:sw=4:et:enc=utf-8:
