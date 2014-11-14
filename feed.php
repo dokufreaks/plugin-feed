@@ -69,7 +69,16 @@ if($cmod && (@filemtime(DOKU_CONF . 'local.php') > $cmod
 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 header('Pragma: public');
 header('Content-Type: application/xml; charset=utf-8');
-if($cmod && (($cmod + $conf['rss_update'] > time()) || ($cmod > @filemtime($conf['changelog'])))) {
+
+if($cmod && (
+        ($cmod + $conf['rss_update'] > time())
+        || (
+            ($cmod > @filemtime($conf['changelog']))
+            &&
+            //discussion has its own changelog
+            ($plugin !== 'discussion' || $cmod > @filemtime($conf['metadir'].'/_comments.changes'))
+        )
+    )) {
     http_conditionalRequest($cmod);
     if($conf['allowdebug']) header("X-CacheUsed: $cache");
     print io_readFile($cache);
