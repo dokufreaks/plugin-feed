@@ -1,13 +1,13 @@
 <?php
 /**
  * Feed Plugin: creates a feed link for a given blog namespace
- * 
+ *
  * @license  GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author   Esther Brunner <wikidesign@gmail.com>
  */
 
 // must be run within Dokuwiki
-if (!defined('DOKU_INC')) die();
+if(!defined('DOKU_INC')) die();
 
 /**
  * Class syntax_plugin_feed
@@ -17,8 +17,9 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     /**
      * To support feeds in your plugin, add an array here
      *
-     * The array key is important: $plugin->getLang($key) is used for the feed title and a
-     * function 'get'.$key (for example getTopic for 'topic') must exist in your helper.php!
+     * The array key is important:
+     *   - $plugin->getLang($key) is used for the feed title
+     *   - and a function 'get'.$key (for example getTopic for 'topic') must exist in your helper.php!
      *
      * The first param should eigther be 'id' or 'ns' as it will go through cleanID()
      *
@@ -26,15 +27,17 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      */
     protected function _registeredFeeds() {
         $feeds = array(
-                'blog'     => array('plugin' => 'blog', 'params' => array('ns', 'num')),
-                'comments' => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
-                'threads'  => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
-                'editor'   => array('plugin' => 'editor', 'params' => array('ns', 'user')),
-                'topic'    => array('plugin' => 'tag', 'params' => array('ns', 'tag')),
-                'tasks'    => array('plugin' => 'task', 'params' => array('ns', 'filter')),
-                );
-        foreach ($feeds as $key => $value) {
-            if (!@file_exists(DOKU_PLUGIN.$value['plugin'].'/helper.php')) unset($feeds[$key]);
+            'blog'      => array('plugin' => 'blog',        'params' => array('ns', 'num')),
+            'comments'  => array('plugin' => 'discussion',  'params' => array('ns', 'num')),
+            'threads'   => array('plugin' => 'discussion',  'params' => array('ns', 'num')),
+            'editor'    => array('plugin' => 'editor',      'params' => array('ns', 'user')),
+            'topic'     => array('plugin' => 'tag',         'params' => array('ns', 'tag')),
+            'tasks'     => array('plugin' => 'task',        'params' => array('ns', 'filter')),
+        );
+        foreach($feeds as $key => $value) {
+            if(!@file_exists(DOKU_PLUGIN . $value['plugin'] . '/helper.php')) {
+                unset($feeds[$key]);
+            }
         }
         return $feeds;
     }
@@ -46,14 +49,18 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      *
      * @return string
      */
-    public function getType() { return 'substition'; }
+    public function getType() {
+        return 'substition';
+    }
 
     /**
      * Sort for applying this mode
      *
      * @return int
      */
-    public function getSort() { return 308; }
+    public function getSort() {
+        return 308;
+    }
 
     /**
      * @param string $mode
@@ -80,9 +87,13 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         list($params, $title) = explode('|', $data, 2);
         list($param1, $param2) = explode('?', $params, 2);
 
-        if (($param1 == '*') || ($param1 == ':')) $param1 = '';
-        elseif ($param1 == '.') $param1 = getNS($ID);
-        else $param1 = cleanID($param1);
+        if(($param1 == '*') || ($param1 == ':')) {
+            $param1 = '';
+        } elseif($param1 == '.') {
+            $param1 = getNS($ID);
+        } else {
+            $param1 = cleanID($param1);
+        }
 
         return array($feed, $param1, trim($param2), trim($title));
     }
@@ -90,48 +101,53 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
     /**
      * Handles the actual output creation.
      *
-     * @param   $mode   string        output format being rendered
+     * @param   $mode     string        output format being rendered
      * @param   $renderer Doku_Renderer the current renderer object
      * @param   $data     array         data created by handler()
      * @return  boolean                 rendered correctly?
      */
     public function render($mode, Doku_Renderer $renderer, $data) {
-        list($feed, $p1, $p2, $title) = $data;
+        list($feed, $param1, $param2, $title) = $data;
 
         $feeds = $this->_registeredFeeds();
-        if (!isset($feeds[$feed])) {
-            msg('Unknown plugin feed '.hsc($feed).'.', -1);
+        if(!isset($feeds[$feed])) {
+            msg('Unknown plugin feed ' . hsc($feed) . '.', -1);
             return false;
         }
 
         $plugin = $feeds[$feed]['plugin'];
-        if (plugin_isdisabled($plugin) || (!$po =& plugin_load('helper', $plugin))) {
-            msg('Missing or invalid helper plugin for '.hsc($feed).'.', -1);
+        if(plugin_isdisabled($plugin) || (!$po =& plugin_load('helper', $plugin))) {
+            msg('Missing or invalid helper plugin for ' . hsc($feed) . '.', -1);
             return false;
         }
 
-        $fn = 'get'.ucwords($feed);
+        $fn = 'get' . ucwords($feed);
 
-        if (!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $p1));
-        if (!$title) $title = ucwords(str_replace('_', ' ', $p2));
+        if(!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $param1));
+        if(!$title) $title = ucwords(str_replace('_', ' ', $param2));
 
-        if ($mode == 'xhtml') {
+        if($mode == 'xhtml') {
             /** @var Doku_Renderer_xhtml $renderer */
-            $url = DOKU_BASE.'lib/plugins/feed/feed.php?plugin='.$plugin.'&amp;fn='.$fn.
-                '&amp;'.$feeds[$feed]['params'][0].'='.urlencode($p1);
-            if ($p2) $url .= '&amp;'.$feeds[$feed]['params'][1].'='.urlencode($p2);
-            $url .= '&amp;title='.urlencode($po->getLang($feed));
-            $title = hsc($title);
+            $url = DOKU_BASE . 'lib/plugins/feed/feed.php?plugin=' . $plugin .
+                '&amp;fn=' . $fn .
+                '&amp;' . $feeds[$feed]['params'][0] . '=' . urlencode($param1);
+            if($param2) {
+                $url .= '&amp;' . $feeds[$feed]['params'][1] . '=' . urlencode($param2);
+            }
+            $url .= '&amp;title=' . urlencode($po->getLang($feed));
 
-            $renderer->doc .= '<a href="'.$url.'" class="feed" rel="nofollow"'.
-                ' type="application/rss+xml" title="'.$title.'">'.$title.'</a>';
+            $title = hsc($title);
+            $renderer->doc .= '<a href="' . $url . '" class="feed" rel="nofollow"' .
+                ' type="application/rss+xml" title="' . $title . '">' . $title . '</a>';
 
             return true;
 
             // for metadata renderer
-        } elseif ($mode == 'metadata') {
+        } elseif($mode == 'metadata') {
             /** @var Doku_Renderer_metadata $renderer */
-            if ($renderer->capture) $renderer->doc .= $title;
+            if($renderer->capture) {
+                $renderer->doc .= $title;
+            }
 
             return true;
         }
