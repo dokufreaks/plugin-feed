@@ -85,17 +85,17 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         list($feed, $data) = explode('>', $match, 2);
         $feed = substr($feed, 0, -4);
         list($params, $title) = explode('|', $data, 2);
-        list($param1, $param2) = explode('?', $params, 2);
+        list($namespace, $parameter) = explode('?', $params, 2);
 
-        if(($param1 == '*') || ($param1 == ':')) {
-            $param1 = '';
-        } elseif($param1 == '.') {
-            $param1 = getNS($ID);
+        if(($namespace == '*') || ($namespace == ':')) {
+            $namespace = '';
+        } elseif($namespace == '.') {
+            $namespace = getNS($ID);
         } else {
-            $param1 = cleanID($param1);
+            $namespace = cleanID($namespace);
         }
 
-        return array($feed, $param1, trim($param2), trim($title));
+        return array($feed, $namespace, trim($parameter), trim($title));
     }
 
     /**
@@ -107,7 +107,7 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      * @return  boolean                 rendered correctly?
      */
     public function render($mode, Doku_Renderer $renderer, $data) {
-        list($feed, $param1, $param2, $title) = $data;
+        list($feed, $namespace, $parameter, $title) = $data;
 
         $feeds = $this->_registeredFeeds();
         if(!isset($feeds[$feed])) {
@@ -123,16 +123,16 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
 
         $fn = 'get' . ucwords($feed);
 
-        if(!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $param1));
-        if(!$title) $title = ucwords(str_replace('_', ' ', $param2));
+        if(!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $namespace));
+        if(!$title) $title = ucwords(str_replace('_', ' ', $parameter));
 
         if($mode == 'xhtml') {
             /** @var Doku_Renderer_xhtml $renderer */
             $url = DOKU_BASE . 'lib/plugins/feed/feed.php?plugin=' . $plugin .
                 '&amp;fn=' . $fn .
-                '&amp;' . $feeds[$feed]['params'][0] . '=' . urlencode($param1);
-            if($param2) {
-                $url .= '&amp;' . $feeds[$feed]['params'][1] . '=' . urlencode($param2);
+                '&amp;' . $feeds[$feed]['params'][0] . '=' . urlencode($namespace);
+            if($parameter) {
+                $url .= '&amp;' . $feeds[$feed]['params'][1] . '=' . urlencode($parameter);
             }
             $url .= '&amp;title=' . urlencode($po->getLang($feed));
 
