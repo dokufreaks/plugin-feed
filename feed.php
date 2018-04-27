@@ -13,7 +13,9 @@ require_once(DOKU_INC . 'inc/init.php');
 require_once(DOKU_INC . 'inc/common.php');
 require_once(DOKU_INC . 'inc/events.php');
 require_once(DOKU_INC . 'inc/parserutils.php');
-require_once(DOKU_INC . 'inc/feedcreator.class.php');
+if (!class_exists('UniversalFeedCreator')) {
+    require_once(DOKU_INC . 'inc/feedcreator.class.php');
+}
 require_once(DOKU_INC . 'inc/auth.php');
 require_once(DOKU_INC . 'inc/pageutils.php');
 require_once(DOKU_INC . 'inc/httputils.php');
@@ -88,7 +90,11 @@ if($cmod && (
 }
 
 // create new feed
-$rss = new DokuWikiFeedCreator();
+if (!class_exists('UniversalFeedCreator')) {
+    $rss = new DokuWikiFeedCreator();
+} else {
+    $rss = new UniversalFeedCreator();
+}
 $rss->title = $title;
 if($ns) {
     $rss->title .= ' ' . ucwords(str_replace(array('_', ':'), array(' ', ': '), $ns));
@@ -110,7 +116,11 @@ if($po =& plugin_load('helper', $plugin)) {
     feed_getPages($rss, $po, $ns, $num, $fn);
 }
 
-$feed = $rss->createFeed($type, 'utf-8');
+if (!class_exists('UniversalFeedCreator')) {
+    $feed = $rss->createFeed($type, 'utf-8');
+} else {
+    $feed = $rss->createFeed($type);
+}
 
 // save cachefile
 io_saveFile($cache, $feed);
