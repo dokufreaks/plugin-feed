@@ -6,13 +6,11 @@
  * @author   Esther Brunner <wikidesign@gmail.com>
  */
 
-// must be run within Dokuwiki
-if(!defined('DOKU_INC')) die();
-
 /**
  * Class syntax_plugin_feed
  */
-class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
+class syntax_plugin_feed extends DokuWiki_Syntax_Plugin
+{
 
     /**
      * To support feeds in your plugin, add an array here
@@ -25,17 +23,18 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      *
      * Unless the second parameter is 'num', your plugin will have to handle it on its own
      */
-    protected function _registeredFeeds() {
+    protected function _registeredFeeds()
+    {
         $feeds = array(
-            'blog'      => array('plugin' => 'blog',        'params' => array('ns', 'num')),
-            'comments'  => array('plugin' => 'discussion',  'params' => array('ns', 'num')),
-            'threads'   => array('plugin' => 'discussion',  'params' => array('ns', 'num')),
-            'editor'    => array('plugin' => 'editor',      'params' => array('ns', 'user')),
-            'topic'     => array('plugin' => 'tag',         'params' => array('ns', 'tag')),
-            'tasks'     => array('plugin' => 'task',        'params' => array('ns', 'filter')),
+            'blog' => array('plugin' => 'blog', 'params' => array('ns', 'num')),
+            'comments' => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
+            'threads' => array('plugin' => 'discussion', 'params' => array('ns', 'num')),
+            'editor' => array('plugin' => 'editor', 'params' => array('ns', 'user')),
+            'topic' => array('plugin' => 'tag', 'params' => array('ns', 'tag')),
+            'tasks' => array('plugin' => 'task', 'params' => array('ns', 'filter')),
         );
-        foreach($feeds as $key => $value) {
-            if(!@file_exists(DOKU_PLUGIN . $value['plugin'] . '/helper.php')) {
+        foreach ($feeds as $key => $value) {
+            if (!@file_exists(DOKU_PLUGIN . $value['plugin'] . '/helper.php')) {
                 unset($feeds[$key]);
             }
         }
@@ -49,7 +48,8 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      *
      * @return string
      */
-    public function getType() {
+    public function getType()
+    {
         return 'substition';
     }
 
@@ -58,27 +58,30 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      *
      * @return int
      */
-    public function getSort() {
+    public function getSort()
+    {
         return 308;
     }
 
     /**
      * @param string $mode
      */
-    public function connectTo($mode) {
+    public function connectTo($mode)
+    {
         $this->Lexer->addSpecialPattern('\{\{\w+?feed>.+?\}\}', $mode, 'plugin_feed');
     }
 
     /**
      * Handler to prepare matched data for the rendering process
      *
-     * @param   string       $match   The text matched by the patterns
-     * @param   int          $state   The lexer state for the match
-     * @param   int          $pos     The character position of the matched text
-     * @param   Doku_Handler $handler The Doku_Handler object
+     * @param string $match The text matched by the patterns
+     * @param int $state The lexer state for the match
+     * @param int $pos The character position of the matched text
+     * @param Doku_Handler $handler The Doku_Handler object
      * @return  array Return an array with all data you want to use in render
      */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    public function handle($match, $state, $pos, Doku_Handler $handler)
+    {
         global $ID;
 
         $match = substr($match, 2, -2); // strip markup
@@ -87,9 +90,9 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         list($params, $title) = explode('|', $data, 2);
         list($namespace, $parameter) = explode('?', $params, 2);
 
-        if(($namespace == '*') || ($namespace == ':')) {
+        if (($namespace == '*') || ($namespace == ':')) {
             $namespace = '';
-        } elseif($namespace == '.') {
+        } elseif ($namespace == '.') {
             $namespace = getNS($ID);
         } else {
             $namespace = cleanID($namespace);
@@ -106,32 +109,33 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
      * @param   $data     array         data created by handler()
      * @return  boolean                 rendered correctly?
      */
-    public function render($mode, Doku_Renderer $renderer, $data) {
+    public function render($mode, Doku_Renderer $renderer, $data)
+    {
         list($feed, $namespace, $parameter, $title) = $data;
 
         $feeds = $this->_registeredFeeds();
-        if(!isset($feeds[$feed])) {
+        if (!isset($feeds[$feed])) {
             msg('Unknown plugin feed ' . hsc($feed) . '.', -1);
             return false;
         }
 
         $plugin = $feeds[$feed]['plugin'];
-        if(plugin_isdisabled($plugin) || (!$po =& plugin_load('helper', $plugin))) {
+        if (plugin_isdisabled($plugin) || (!$po = plugin_load('helper', $plugin))) {
             msg('Missing or invalid helper plugin for ' . hsc($feed) . '.', -1);
             return false;
         }
 
         $fn = 'get' . ucwords($feed);
 
-        if(!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $namespace));
-        if(!$title) $title = ucwords(str_replace('_', ' ', $parameter));
+        if (!$title) $title = ucwords(str_replace(array('_', ':'), array(' ', ': '), $namespace));
+        if (!$title) $title = ucwords(str_replace('_', ' ', $parameter));
 
-        if($mode == 'xhtml') {
+        if ($mode == 'xhtml') {
             /** @var Doku_Renderer_xhtml $renderer */
             $url = DOKU_BASE . 'lib/plugins/feed/feed.php?plugin=' . $plugin .
                 '&amp;fn=' . $fn .
                 '&amp;' . $feeds[$feed]['params'][0] . '=' . urlencode($namespace);
-            if($parameter) {
+            if ($parameter) {
                 $url .= '&amp;' . $feeds[$feed]['params'][1] . '=' . urlencode($parameter);
             }
             $url .= '&amp;title=' . urlencode($po->getLang($feed));
@@ -143,9 +147,9 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
             return true;
 
             // for metadata renderer
-        } elseif($mode == 'metadata') {
+        } elseif ($mode == 'metadata') {
             /** @var Doku_Renderer_metadata $renderer */
-            if($renderer->capture) {
+            if ($renderer->capture) {
                 $renderer->doc .= $title;
             }
 
@@ -154,4 +158,3 @@ class syntax_plugin_feed extends DokuWiki_Syntax_Plugin {
         return false;
     }
 }
-// vim:ts=4:sw=4:et:enc=utf-8:
